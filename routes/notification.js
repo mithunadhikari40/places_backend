@@ -18,39 +18,6 @@ router.get('/', async (req, res) => {
 });
 
 
-router.get('/download', [auth, admin], async (req, res) => {
-    const list = await Notification.find({}).sort('title');
-    const dateTime = new Date().toISOString().slice(-24).replace(/\D/g, '').slice(0, 14);
-    const filePath = `public/uploads/files/notifications-${dateTime}.csv`;
-    let csv;
-    const fields = ['_id', 'title', 'body', 'sentToEveryone', 'createdDate'];
-
-    try {
-        csv = json2csv(list, { fields });
-    } catch (err) {
-        return res.status(500).json({ err });
-    }
-
-    fs.writeFile(filePath, csv, function (err) {
-        if (err) {
-            return res.json(err).status(500);
-        }
-        else {
-            setTimeout(function () {
-                fs.unlink(filePath, function (err) { // delete this file after 30 seconds
-                    if (err) {
-                        console.error(err);
-                    }
-                    console.log('File has been Deleted');
-                });
-
-            }, 30000);
-            res.json({ filePath });
-        }
-    })
-
-});
-
 
 router.post('/',
     body('title').isLength({ min: 3 }),
