@@ -8,7 +8,7 @@ module.exports = function (req, res, next) {
   if (!token) return res.status(403).json({ error: 'Access denied. No token provided.' });
   var dateNow = new Date();
 
-  jwt.verify(token, process.env.JWT_PRIVATE_KEY, function (err, decoded) {
+  jwt.verify(token, process.env.JWT_PRIVATE_KEY || "places_2021_broadway", function (err, decoded) {
     if (err) {
       return res.status(401).json({ error: err });
 
