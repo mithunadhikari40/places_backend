@@ -12,28 +12,34 @@ const { User } = require('../models/user');
 const { UserSavedPlaces, validateUserPlace } = require('../models/user_saved_places');
 const router = express.Router();
 router.get('/', auth, async (req, res) => {
-    const user=  req.user;
+    const user = req.user;
     let savedAddress;
-    if(user.isAdmin){
-         savedAddress = await UserSavedPlaces.find().sort('name');
-    }else{
-         savedAddress = await UserSavedPlaces.find({user:user._id}).sort('name');
+    if (user.isAdmin) {
+        savedAddress = await UserSavedPlaces.find().sort('name');
+    } else {
+        savedAddress = await UserSavedPlaces.find({ user: user._id }).sort('name');
     }
+    res.json(savedAddress);
+});
+router.get('/all', async (req, res) => {
+
+    const savedAddress = await UserSavedPlaces.find().sort('name');
+
     res.json(savedAddress);
 });
 
 router.post('/', auth, async (req, res) => {
-   
+
     const { error } = validateUserPlace(req.body);
     if (error) return res.status(400).json({ error: error.details[0].message });
 
     let user = await User.findById(req.user._id);
-    
+
     if (!user) return res.status(400).json({ error: 'User Not found' });
 
     let place = await UserSavedPlaces.findOne({ name: req.body.name, user: req.user });
     if (place) return res.status(400).json({ error: 'Place already exists with the given name.' });
- 
+
 
     if (!req.files || Object.keys(req.files).length === 0) {
         return res.status(400).json({ error: 'No files were uploaded. Validation failed' });
@@ -68,22 +74,22 @@ router.post('/', auth, async (req, res) => {
         // method = await method.save();
 
         // res.send(method);
-        
-    
-        const { name, city, street, monument, latitude,  longitude,address,description } = req.body;
+
+
+        const { name, city, street, monument, latitude, longitude, address, description } = req.body;
         const date = Date();
-    
-        place = new UserSavedPlaces({ name, city, street,address, image: imagePath, description, monument, latitude, longitude, created: date, user });
+
+        place = new UserSavedPlaces({ name, city, street, address, image: imagePath, description, monument, latitude, longitude, created: date, user });
         place = await place.save();
-        place =_.pick(place, ['_id','name', 'city', 'street', 'image','description', 'address', 'monument', 'latitude', 'longitude','created']);
-    
-    
+        place = _.pick(place, ['_id', 'name', 'city', 'street', 'image', 'description', 'address', 'monument', 'latitude', 'longitude', 'created']);
+
+
         res.json({ place });
 
     });
 
 
-   
+
 });
 
 router.put('/:id', auth, async (req, res) => {
@@ -92,8 +98,8 @@ router.put('/:id', auth, async (req, res) => {
     const user = req.user;
     const _addr = await UserSavedPlaces.findById(req.params.id);
 
-    if(_addr.user.toString() !== user._id.toString()){
-        return res.status(400).json({ error:"You are not authorized to edit this document" });
+    if (_addr.user.toString() !== user._id.toString()) {
+        return res.status(400).json({ error: "You are not authorized to edit this document" });
     }
 
     const address = await UserSavedPlaces.findByIdAndUpdate(req.params.id, { name: req.body.name }, {
@@ -109,8 +115,8 @@ router.delete('/:id', [auth], async (req, res) => {
     const user = req.user;
     const _addr = await UserSavedPlaces.findById(req.params.id);
 
-    if(_addr.user.toString() !== user._id.toString()){
-        return res.status(400).json({ error:"You are not authorized to delete this document" });
+    if (_addr.user.toString() !== user._id.toString()) {
+        return res.status(400).json({ error: "You are not authorized to delete this document" });
     }
     const address = await UserSavedPlaces.findByIdAndRemove(req.params.id);
 
