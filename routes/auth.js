@@ -106,7 +106,7 @@ router.post('/register', async (req, res) => {
 
 
   const token = user.generateAuthToken();
-  res.json({ user: _.pick(user, ['_id', 'name', 'email', 'phone', 'city']), 'token': token });
+  res.json({'token': token });
 });
 
 
