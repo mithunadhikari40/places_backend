@@ -46,7 +46,7 @@ const userSavedPlacesSchema = new mongoose.Schema({
   }, createdAt: Date,
 });
 
-const UserSavedAddress = mongoose.model('userSavedPlacesSchema', userSavedPlacesSchema);
+const UserSavedAddress = mongoose.model('UserSavedAddress', userSavedPlacesSchema);
 
 function validateUserPlace(user) {
   const schema = Joi.object({
