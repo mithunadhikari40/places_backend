@@ -40,6 +40,12 @@ const userSchema = new mongoose.Schema({
   pushToken: {
     type: String
   },
+  profilePic: {
+    type: String
+  },
+  coverPic: {
+    type: String
+  },
   
 });
 
