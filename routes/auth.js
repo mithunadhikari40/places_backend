@@ -218,7 +218,7 @@ router.put('/updateProfilePic', [auth], async (req, res) => {
   const filename = uuidv4();
   const mimetype = image.mimetype;
   if (!mimetype.includes("image")) {
-    return res.status(400).json({ error: 'Invalid file uploaded, please upload an image' });
+    return res.status(400).json({ error: 'Invalid file uploaded, please upload an image' , mimetype  });
   }
   const extension = mimetype.toString().replace("image/", "");
 
@@ -258,7 +258,7 @@ router.put('/updateCoverPic', [auth], async (req, res) => {
   const filename = uuidv4();
   const mimetype = image.mimetype;
   if (!mimetype.includes("image")) {
-    return res.status(400).json({ error: 'Invalid file uploaded, please upload an image' });
+    return res.status(400).json({ error: 'Invalid file uploaded, please upload an image',mimetype });
   }
   const extension = mimetype.toString().replace("image/", "");
 
