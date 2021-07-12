@@ -200,6 +200,25 @@ router.put('/updateEmail', [auth], async (req, res) => {
 
 });
 
+router.put('/updateToken', [auth], async (req, res) => {
+
+  if (!req.body.token) return res.status(400).json({ error: "Token is required" });
+  const token = req.body.token;
+  if (token.length < 4) {
+    return res.status(400).json({ error: "Token must be at least 4 characters long" });
+  }
+ const user = req.user;
+
+  const updatedUser = await User.findByIdAndUpdate(user._id, { pushToken: token }, { new: true });
+
+  if (!updatedUser) return res.status(404).json({ error: 'The user with the given Id does not exists.' });
+
+
+  res.json({ data: updatedUser });
+
+
+});
+
 router.put('/updateProfilePic', [auth], async (req, res) => {
   const id = req.user._id.toString();
 

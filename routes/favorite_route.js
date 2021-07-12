@@ -3,6 +3,8 @@ const express = require('express');
 const _ = require('lodash');
 const { v4: uuidv4 } = require('uuid');
 var path = require('path');
+var axios = require('axios');
+
 
 const auth = require('../middleware/auth');
 const admin = require('../middleware/admin');
@@ -28,6 +30,10 @@ router.put('/', auth, async (req, res) => {
     favorites = favorites ? favorites : [];
 
     const placeId = req.body.id;
+    let owner = await UserSavedPlaces.findById(placeId);
+    owner = owner.user;
+
+
 
 
     let list = favorites.length == 0 ? [] : favorites.places;
@@ -59,7 +65,113 @@ router.put('/', auth, async (req, res) => {
     }
 
     res.json(updated);
+    if(user._id.toString() !== owner._id.toString()){
+        //get the notification from the owner
+        const pushToken = owner.pushToken;
+        if(pushToken){
+            //send a notfication
+
+            //This is the data we are posting, it needs to be a string or a buffer
+        const notificationData = {
+            // "to": "eB5papU2Xdc:APA91bFFvc3dXru1fN5JY8U19oHIpfGhPUx7Ll7v9vJYTsIGZ15mDwB2Wpep3flLK85IUqqs2WqJwjYHSDYX28oJ1wTP0R2TDc2ba_uVjUauDcp3pCNKr_0KlghOnS",
+            "registration_ids": pushToken,
+            "notification": {
+                "body": `${owner.name} added one of your place to their favorite list`,
+                "OrganizationId": "2",
+                "content_available": true,
+                "priority": "high",
+                "subtitle": "Elementary School",
+                "Title": `Your place is getting popular.`
+            },
+            "data": {
+                "priority": "high",
+                "sound": "app_sound.wav",
+                "content_available": true,
+                "bodyText": `${owner.name} added one of your place to their favorite list`,
+                "organization": "Elementary school",
+                "click_action": "FLUTTER_NOTIFICATION_CLICK"
+            }
+        };
+        axios
+            .post('https://fcm.googleapis.com/fcm/send', notificationData, {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'key=AAAA9z9l4tY:APA91bHAkI_d3yCrBu9Co8T0IWpxo-vxe-LhopZEY3MXrMlJzeXG1gVKPl_V0tb_uMBdeek1QWszviyG7ciIoAlhRxMGWRAAYx7DCW7cTHLBlJ-KL64Q8Opx8oP2z-3EwHCZf5Zm3tbG'
+                }
+            })
+            .then(res => {
+                console.log(`statusCode of the response: ${res.statusCode}`)
+                console.log(res)
+                return res.json({ data: res });
+            })
+            .catch(error => {
+                console.error(error);
+                return res.json({  error });
+
+            });
+
+
+        }
+    }
 });
+
+
+
+
+router.put('/testNotification', auth, async (req, res) => {   
+
+    const token = req.body.token;
+
+        if(token){
+            //send a notfication
+
+            //This is the data we are posting, it needs to be a string or a buffer
+        const notificationData = {
+            // "to": "eB5papU2Xdc:APA91bFFvc3dXru1fN5JY8U19oHIpfGhPUx7Ll7v9vJYTsIGZ15mDwB2Wpep3flLK85IUqqs2WqJwjYHSDYX28oJ1wTP0R2TDc2ba_uVjUauDcp3pCNKr_0KlghOnS",
+            "registration_ids": token,
+            "notification": {
+                "body": ` Someone added one of your place to their favorite list`,
+                "OrganizationId": "2",
+                "content_available": true,
+                "priority": "high",
+                "subtitle": "Elementary School",
+                "Title": `Your place is getting popular.`
+            },
+            "data": {
+                "priority": "high",
+                "sound": "app_sound.wav",
+                "content_available": true,
+                "bodyText": `Someone added one of your place to their favorite list`,
+                "organization": "Elementary school",
+                "click_action": "FLUTTER_NOTIFICATION_CLICK"
+            }
+        };
+        axios
+            .post('https://fcm.googleapis.com/fcm/send', notificationData, {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'key=AAAA9z9l4tY:APA91bHAkI_d3yCrBu9Co8T0IWpxo-vxe-LhopZEY3MXrMlJzeXG1gVKPl_V0tb_uMBdeek1QWszviyG7ciIoAlhRxMGWRAAYx7DCW7cTHLBlJ-KL64Q8Opx8oP2z-3EwHCZf5Zm3tbG'
+                }
+            })
+            .then(res => {
+                console.log(`statusCode of the response: ${res.statusCode}`)
+                console.log(res)
+                return res.json({ notificationData: res });
+            })
+            .catch(error => {
+                console.error(error);
+                return res.json({ notificationError: error });
+
+            });
+
+
+        }
+    
+});
+
+
+
+
 router.get('/isFavorite/:id', [auth], async (req, res) => {
     const user = req.user;
     let favorites = await Favorite.findOne({ user: user });

@@ -3,6 +3,7 @@ const jwt = require('jsonwebtoken');
 const Joi = require('joi');
 const mongoose = require('mongoose');
 const _ = require('lodash');
+const { clear } = require('winston');
 
 const userSchema = new mongoose.Schema({
   name: {
@@ -53,8 +54,8 @@ userSchema.methods.generateAuthToken = function() {
   console.log("id is ",this._id, "and admin is ",this.isAdmin);
   const token = jwt.sign({ _id: this._id, isAdmin: this.isAdmin }, process.env.JWT_PRIVATE_KEY || "places_2021_broadway",
     
-    { expiresIn: "7d" }
-    // { expiresIn: "300s" }
+    // { expiresIn: "7d" }
+    { expiresIn: "300s" }
     );
   return token;
 }
