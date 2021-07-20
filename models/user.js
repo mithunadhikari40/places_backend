@@ -54,8 +54,7 @@ userSchema.methods.generateAuthToken = function() {
   console.log("id is ",this._id, "and admin is ",this.isAdmin);
   const token = jwt.sign({ _id: this._id, isAdmin: this.isAdmin }, process.env.JWT_PRIVATE_KEY || "places_2021_broadway",
     
-    // { expiresIn: "7d" }
-    { expiresIn: "300s" }
+    { expiresIn: "1d" }
     );
   return token;
 }
