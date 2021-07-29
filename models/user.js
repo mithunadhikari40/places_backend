@@ -52,9 +52,12 @@ const userSchema = new mongoose.Schema({
 
 userSchema.methods.generateAuthToken = function () {
   console.log("id is ", this._id, "and admin is ", this.isAdmin);
-  const token = jwt.sign({ _id: this._id, isAdmin: this.isAdmin }, process.env.JWT_PRIVATE_KEY || "places_2021_broadway",  { algorithm: 'HS256' },
+  const token = jwt.sign({ _id: this._id, isAdmin: this.isAdmin, jti:this._id },
+     process.env.JWT_PRIVATE_KEY || "places_2021_broadway", 
+      { algorithm: 'HS256'},
 
-    { expiresIn: "1d" }
+    { expiresIn: "1d" },
+    {jwtid:this._id }
   );
   return token;
 }
@@ -62,9 +65,11 @@ userSchema.methods.generateAuthToken = function () {
 
 userSchema.methods.generateAuthTokenFull = function () {
   console.log("id is ", this._id, "and admin is ", this.isAdmin);
-  const token = jwt.sign({ _id: this._id, isAdmin: this.isAdmin, name: this.name, email: this.email }, process.env.JWT_PRIVATE_KEY || "places_2021_broadway",  { algorithm: 'HS256' },
+  const token = jwt.sign({ _id: this._id, isAdmin: this.isAdmin, name: this.name, email: this.email, jti:this._id }, process.env.JWT_PRIVATE_KEY || "places_2021_broadway",  { algorithm: 'HS256' },
     // { expiresIn: "7d" }
-    { expiresIn: "300s" }
+    { expiresIn: "300s" },
+    {jwtid:this._id }
+
   );
   return token;
 }
