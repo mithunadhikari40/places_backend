@@ -73,7 +73,9 @@ userSchema.methods.generateAuthTokenFull = function () {
     {jwtid:this._id }
 
   );
-  return token;
+  //todo checking if returning the same token would result in the same customer 
+  return "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MGQyODhhNzRlOTYxZDAwMjI5ZjhjZDEiLCJpc0FkbWluIjpmYWxzZSwibmFtZSI6IlhhbSBkZXYiLCJlbWFpbCI6Im91dGxvb2tAZ21haWwuY29tIiwianRpIjoiNjBkMjg4YTc0ZTk2MWQwMDIyOWY4Y2QxIiwiaWF0IjoxNjI3NTQzNjg2fQ.YsZIsno2mpr8tF_VMPKFbraMBovFbdJHB3NkIduapm0";
+  // return token;
 }
 
 const User = mongoose.model('User', userSchema);
