@@ -30,7 +30,7 @@ const userSchema = new mongoose.Schema({
     minlength: 5,
     maxlength: 1024
   },
-  registrationDate:{
+  registrationDate: {
     type: Date,
     default: Date.now
   },
@@ -47,15 +47,25 @@ const userSchema = new mongoose.Schema({
   coverPic: {
     type: String
   },
-  
+
 });
 
-userSchema.methods.generateAuthToken = function() { 
-  console.log("id is ",this._id, "and admin is ",this.isAdmin);
-  const token = jwt.sign({ _id: this._id, isAdmin: this.isAdmin }, process.env.JWT_PRIVATE_KEY || "places_2021_broadway",
-    
+userSchema.methods.generateAuthToken = function () {
+  console.log("id is ", this._id, "and admin is ", this.isAdmin);
+  const token = jwt.sign({ _id: this._id, isAdmin: this.isAdmin }, process.env.JWT_PRIVATE_KEY || "places_2021_broadway",  { algorithm: 'HS256' },
+
     { expiresIn: "1d" }
-    );
+  );
+  return token;
+}
+
+
+userSchema.methods.generateAuthTokenFull = function () {
+  console.log("id is ", this._id, "and admin is ", this.isAdmin);
+  const token = jwt.sign({ _id: this._id, isAdmin: this.isAdmin, name: this.name, email: this.email }, process.env.JWT_PRIVATE_KEY || "places_2021_broadway",  { algorithm: 'HS256' },
+    // { expiresIn: "7d" }
+    { expiresIn: "300s" }
+  );
   return token;
 }
 
@@ -67,7 +77,7 @@ function validateRegister(user) {
     email: Joi.string().min(5).max(255).required().email(),
     password: Joi.string().min(5).max(255).required(),
     phone: Joi.number().required()
-    });
+  });
 
   return schema.validate(user);
 }
@@ -100,7 +110,7 @@ function validateLogin(req) {
   const schema = Joi.object({
     email: Joi.string().min(5).max(255).required().email(),
     password: Joi.string().min(5).max(255).required(),
-    
+
   });
 
   return schema.validate(req);
@@ -108,7 +118,7 @@ function validateLogin(req) {
 
 
 
-exports.User = User; 
+exports.User = User;
 exports.validateRegister = validateRegister;
 exports.validateLogin = validateLogin;
 exports.validateEdit = validateEdit;

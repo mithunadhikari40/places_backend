@@ -2,6 +2,7 @@ const Joi = require('joi');
 const bcrypt = require('bcrypt');
 const { v4: uuidv4 } = require('uuid');
 var path = require('path');
+const jwt = require('jsonwebtoken');
 const _ = require('lodash');
 const { User, validateRegister, validateLogin } = require('../models/user');
 const mongoose = require('mongoose');
@@ -295,6 +296,39 @@ router.put('/updateCoverPic', [auth], async (req, res) => {
   });
 
 });
+
+
+router.post('/getTokenForZendesk', async (req, res) => {
+
+  if (!req.body.user_token) return res.status(400).json({ error: "User token is required" });
+  const user_token = req.body.user_token;
+  if (user_token.length < 2) {
+    return res.status(401).json({ error: "User token must be at least 2 characters long" });
+  }
+
+
+  jwt.verify(user_token, process.env.JWT_PRIVATE_KEY || "places_2021_broadway", { algorithm: 'HS256' }, async function (err, decoded) {
+    if (err) {
+      return res.status(401).json({ error: err });
+    }
+    var dateNow = new Date();
+
+    console.log("The decoded item is ", decoded);
+    if (decoded.exp < dateNow.getTime() / 1000) {
+      return res.status(401).json({ error: 'Token expired, please login in again.' });
+
+    }
+
+    const user1 = await User.findById(decoded._id);
+    const jwt = user1.generateAuthTokenFull();
+
+    res.status(200).json({ jwt });
+
+  });
+
+
+});
+
 
 
 
