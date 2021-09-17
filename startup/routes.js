@@ -4,6 +4,8 @@ const auth = require('../routes/auth');
 const savedAddress = require('../routes/user_saved_places');
 const notificaion = require('../routes/notification');
 const favorite = require('../routes/favorite_route');
+const albums = require('../routes/albums_route');
+
 
 
 
@@ -17,6 +19,8 @@ module.exports = function(app) {
   app.use('/api/notification', notificaion);
   app.use('/api/places', savedAddress);
   app.use('/api/favorite', favorite);
+  app.use('/api/albums', albums);
+
 
 
 
